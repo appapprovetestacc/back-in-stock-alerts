@@ -82,11 +82,12 @@ export async function action({ request, context }: ActionFunctionArgs) {
       .insert(backInStockSubscriptions)
       .values({
         shop,
+        shopDomain: shop,
         variantId,
+        customerEmail: email,
         email,
         status: "pending",
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       })
       .onConflictDoNothing();
 

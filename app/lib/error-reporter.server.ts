@@ -80,6 +80,21 @@ export async function reportError(
   }
 }
 
+// Structured logger for use in webhook handlers and server-side code.
+// Writes to console so Cloudflare dashboard picks it up, and accepts
+// an optional metadata object for structured context.
+export const logger = {
+  info(message: string, meta?: Record<string, string>): void {
+    console.info("[INFO]", message, meta ?? "");
+  },
+  warn(message: string, meta?: Record<string, string>): void {
+    console.warn("[WARN]", message, meta ?? "");
+  },
+  error(message: string, meta?: Record<string, string>): void {
+    console.error("[ERROR]", message, meta ?? "");
+  },
+};
+
 async function hmacHex(secret: string, body: string): Promise<string> {
   // Workers crypto.subtle — same algorithm as
   // lib/health-monitor/project-secret.ts on the landing side.
