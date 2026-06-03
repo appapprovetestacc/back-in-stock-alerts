@@ -3,6 +3,22 @@
 Shopify App scaffolded by [AppApprove](https://appapprove.com). Built on
 Remix + Cloudflare Workers.
 
+## What this app does
+
+**Back in Stock Alerts** lets customers subscribe to out-of-stock products and automatically receive an email notification the moment inventory is replenished.
+
+### How it works
+
+1. **Customer subscribes** — A customer visits the public subscription page at `/customer/back-in-stock?shop=<shop>&productId=<id>` and enters their email address. The subscription is stored in D1 (Cloudflare's SQLite).
+
+2. **Inventory is replenished** — When a merchant restocks a product, Shopify fires the `inventory_levels/update` webhook to this app.
+
+3. **Notification is sent** — The webhook handler checks for active subscriptions matching the replenished variant, sends each subscriber an email via the `sendMail()` helper, and marks the subscription as notified.
+
+### Admin dashboard
+
+Merchants can view subscription counts and manage settings from the embedded admin dashboard at the app's root route. The dashboard uses Polaris components and App Bridge JWT authentication.
+
 ## Local development
 
 ```bash
@@ -15,6 +31,31 @@ pnpm dev
 
 This repo is automatically deployed by AppApprove on every push to `main`.
 Your live URL is `https://back-in-stock-alerts.appapprove.app`.
+
+## Key routes
+
+| Route | Description |
+|---|---|
+| `/app` | Embedded admin dashboard (Polaris + App Bridge) |
+| `/customer/back-in-stock` | Public customer subscription form (no auth required) |
+| `/webhooks/*` | HMAC-verified Shopify webhook endpoint |
+| `/auth` | OAuth entry point |
+| `/auth/callback` | OAuth callback — saves offline session to KV |
+
+## Webhooks
+
+| Topic | Handler | Purpose |
+|---|---|---|
+| `inventory_levels/update` | `app/webhooks/inventory-levels-update.ts` | Detects restocks and triggers email notifications |
+| `customers/data_request` | `app/webhooks/customers-data-request.ts` | GDPR: export customer data |
+| `customers/redact` | `app/webhooks/customers-redact.ts` | GDPR: delete customer data |
+| `shop/redact` | `app/webhooks/shop-redact.ts` | GDPR: delete shop data on uninstall |
+
+## Scopes
+
+```
+read_products,read_inventory
+```
 
 ## What's in here
 
