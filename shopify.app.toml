@@ -11,7 +11,7 @@ embedded = true
 [access_scopes]
 # Comma-separated list of API scopes. Match these to what your code actually
 # uses — the AppApprove pre-submission checker flags scope drift.
-scopes = "read_products"
+scopes = "read_products,read_inventory"
 
 [auth]
 redirect_urls = [
@@ -38,6 +38,10 @@ api_version = "2026-01"
   [[webhooks.subscriptions]]
   topics = [ "app_subscriptions/update" ]
   uri = "/webhooks/app_subscriptions/update"
+
+  [[webhooks.subscriptions]]
+  topics = [ "inventory_levels/update" ]
+  uri = "/webhooks"
 
 [pos]
 embedded = false
